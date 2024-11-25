@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface Link {
   id: string;
@@ -12,6 +12,8 @@ interface Link {
 }
 
 export function AdminPanel() {
+  const queryClient = useQueryClient();
+  
   const { data: links, isLoading, refetch } = useQuery({
     queryKey: ['pending-links'],
     queryFn: async () => {
@@ -38,7 +40,8 @@ export function AdminPanel() {
     }
 
     toast.success("Link approved!");
-    refetch();
+    queryClient.invalidateQueries({ queryKey: ['links'] });
+    queryClient.invalidateQueries({ queryKey: ['pending-links'] });
   };
 
   const handleReject = async (id: string) => {
@@ -53,7 +56,7 @@ export function AdminPanel() {
     }
 
     toast.success("Link rejected!");
-    refetch();
+    queryClient.invalidateQueries({ queryKey: ['pending-links'] });
   };
 
   if (isLoading) {

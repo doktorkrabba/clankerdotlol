@@ -34,19 +34,18 @@ export function AdminPanel() {
         .from('links')
         .update({ approved: true })
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         console.error('Supabase error:', error);
         throw error;
       }
 
-      if (!data) {
-        throw new Error('Failed to update link');
+      if (!data || data.length === 0) {
+        throw new Error('Link not found');
       }
 
-      return data;
+      return data[0];
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });

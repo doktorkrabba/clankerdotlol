@@ -36,20 +36,25 @@ export function AdminPanel() {
         .eq('id', id)
         .select();
 
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        throw new Error('Link not found');
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error(error.message);
       }
+      
+      if (!data || data.length === 0) {
+        throw new Error('Link not found or already approved');
+      }
+      
       return data[0];
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });
       queryClient.invalidateQueries({ queryKey: ['links'] });
-      toast.success("Link approved successfully!");
+      toast.success(`Successfully approved "${data.title}"`);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Approval error:', error);
-      toast.error("Failed to approve link");
+      toast.error(`Failed to approve link: ${error.message}`);
     }
   });
 
@@ -66,8 +71,8 @@ export function AdminPanel() {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });
       toast.success("Link rejected!");
     },
-    onError: () => {
-      toast.error("Failed to reject link");
+    onError: (error: Error) => {
+      toast.error(`Failed to reject link: ${error.message}`);
     }
   });
 

@@ -1,18 +1,21 @@
 import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { ContentDisplay } from "@/components/ContentDisplay";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  // This would typically fetch from a backend
-  const approvedContent = [
-    {
-      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      type: "youtube" as const,
+  const { data: links, isLoading } = useQuery({
+    queryKey: ['links'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('links')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
     },
-    {
-      url: "https://picsum.photos/400/300",
-      type: "image" as const,
-    },
-  ];
+  });
 
   return (
     <div className="min-h-screen bg-[#008080] p-4">
@@ -22,13 +25,20 @@ const Index = () => {
         <SubmitLinkForm />
         
         <div className="space-y-4">
-          {approvedContent.map((content, index) => (
-            <ContentDisplay
-              key={index}
-              url={content.url}
-              type={content.type}
-            />
-          ))}
+          {isLoading ? (
+            <p className="text-center text-white">Loading...</p>
+          ) : (
+            links?.map((content) => (
+              <div key={content.id} className="space-y-2">
+                <h2 className="text-xl font-semibold text-white">{content.title}</h2>
+                <ContentDisplay
+                  url={content.url}
+                  type={content.url.includes('youtube.com') ? 'youtube' : 
+                        content.url.match(/\.(gif|jpe?g|png)$/i) ? 'image' : 'link'}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

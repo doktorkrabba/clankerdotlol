@@ -13,9 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   url: z.string().url("Please enter a valid URL"),
+  title: z.string().min(1, "Title is required"),
 });
 
 export function SubmitLinkForm() {
@@ -23,13 +25,23 @@ export function SubmitLinkForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: "",
+      title: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // TODO: Submit to backend
-    toast.success("Link submitted for review!");
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const { error } = await supabase
+        .from('links')
+        .insert([values]);
+
+      if (error) throw error;
+      
+      toast.success("Link submitted successfully!");
+      form.reset();
+    } catch (error) {
+      toast.error("Failed to submit link");
+    }
   }
 
   return (
@@ -40,6 +52,23 @@ export function SubmitLinkForm() {
       <CardContent className="bg-[#c0c0c0] p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-black">Title</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter a title" 
+                      {...field}
+                      className="border-2 border-gray-800 bg-white"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="url"

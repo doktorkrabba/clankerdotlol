@@ -24,7 +24,15 @@ const Index = () => {
     >
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="bg-[#c0c0c0] p-4 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-gray-800">
-          <h1 className="text-4xl font-bold text-black text-center mb-8">Clanker feed</h1>
+          <h1 className="text-4xl font-bold text-black text-center mb-4">Clanker feed</h1>
+          
+          <div className="text-left p-4 border-2 border-gray-800 bg-white">
+            <p className="font-bold text-black text-xl mb-2">
+              clanker <span className="font-normal text-gray-600 text-lg">/ˈklæŋkər/</span>
+            </p>
+            <p className="text-black italic mb-1">noun, informal</p>
+            <p className="text-black">A derogatory word for an AI or a robot that is not doing its job properly</p>
+          </div>
         </div>
         
         <div className="space-y-4">

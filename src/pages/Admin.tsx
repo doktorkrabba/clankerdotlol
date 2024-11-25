@@ -6,35 +6,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Session } from '@supabase/supabase-js';
+import { useSessionContext } from '@supabase/auth-helpers-react';
 
 const Admin = () => {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session, isLoading } = useSessionContext();
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user?.id) {
-        checkAdminStatus(session.user.id);
-      }
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user?.id) {
-        checkAdminStatus(session.user.id);
-      } else {
-        setIsAdmin(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    if (session?.user?.id) {
+      checkAdminStatus(session.user.id);
+    } else if (!isLoading && !session) {
+      setIsAdmin(false);
+    }
+  }, [session, isLoading]);
 
   const checkAdminStatus = async (userId: string) => {
     try {
@@ -52,6 +37,16 @@ const Admin = () => {
       setIsAdmin(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#008080] p-4 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-lg">
+          <p className="text-center">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!session) {
     return (

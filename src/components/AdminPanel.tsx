@@ -30,25 +30,22 @@ export function AdminPanel() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase
+      const linkToUpdate = links?.find(link => link.id === id);
+      if (!linkToUpdate) {
+        throw new Error('Could not find link in current list');
+      }
+
+      const { error } = await supabase
         .from('links')
         .update({ approved: true })
-        .eq('id', id)
-        .select();
+        .eq('id', id);
 
       if (error) {
         console.error('Supabase error:', error);
         throw error;
       }
 
-      // Instead of throwing an error, return the original link data
-      // This ensures we have something to show in the success message
-      const updatedLink = links?.find(link => link.id === id);
-      if (!updatedLink) {
-        throw new Error('Could not find link in current list');
-      }
-
-      return updatedLink;
+      return linkToUpdate;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });

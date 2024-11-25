@@ -5,17 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Session } from '@supabase/supabase-js';
 
 const Admin = () => {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check current session
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      checkAdminStatus(session?.user?.id);
+      if (session?.user?.id) {
+        checkAdminStatus(session.user.id);
+      }
     });
 
     // Listen for auth changes
@@ -23,31 +26,31 @@ const Admin = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      checkAdminStatus(session?.user?.id);
+      if (session?.user?.id) {
+        checkAdminStatus(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminStatus = async (userId: string | undefined) => {
-    if (!userId) {
-      setIsAdmin(false);
-      return;
-    }
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single();
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-
-    if (error) {
+      if (error) throw error;
+      setIsAdmin(data.role === "admin");
+    } catch (error) {
       console.error("Error checking admin status:", error);
       toast.error("Error checking permissions");
-      return;
+      setIsAdmin(false);
     }
-
-    setIsAdmin(data.role === "admin");
   };
 
   if (!session) {

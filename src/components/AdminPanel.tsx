@@ -8,6 +8,7 @@ interface Link {
   id: string;
   url: string;
   title: string;
+  approved: boolean;
 }
 
 export function AdminPanel() {
@@ -17,6 +18,7 @@ export function AdminPanel() {
       const { data, error } = await supabase
         .from('links')
         .select('*')
+        .eq('approved', false)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -25,7 +27,16 @@ export function AdminPanel() {
   });
 
   const handleApprove = async (id: string) => {
-    // TODO: Implement approval logic once we add an approved status column
+    const { error } = await supabase
+      .from('links')
+      .update({ approved: true })
+      .eq('id', id);
+
+    if (error) {
+      toast.error("Failed to approve link");
+      return;
+    }
+
     toast.success("Link approved!");
     refetch();
   };

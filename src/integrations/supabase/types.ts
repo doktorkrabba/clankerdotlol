@@ -11,18 +11,21 @@ export type Database = {
     Tables: {
       links: {
         Row: {
+          approved: boolean | null
           created_at: string
           id: string
           title: string
           url: string
         }
         Insert: {
+          approved?: boolean | null
           created_at?: string
           id?: string
           title: string
           url: string
         }
         Update: {
+          approved?: boolean | null
           created_at?: string
           id?: string
           title?: string

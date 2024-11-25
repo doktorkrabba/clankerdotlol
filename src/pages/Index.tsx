@@ -10,6 +10,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from('links')
         .select('*')
+        .eq('approved', true)
         .order('created_at', { ascending: false });
       
       if (error) throw error;

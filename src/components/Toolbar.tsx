@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 
 export function Toolbar() {
   return (
-    <div className="w-full bg-[#c0c0c0] border-b-2 border-gray-800 p-2 mb-4">
+    <div className="w-full bg-[#c0c0c0] border-b-2 border-gray-800 p-2">
       <div className="max-w-4xl mx-auto flex justify-between items-center">
         <Link to="/" className="text-black font-bold text-xl">
-          Clanker.lol
+          CLANKER.LOL
         </Link>
         <Link to="/submit">
           <Button 

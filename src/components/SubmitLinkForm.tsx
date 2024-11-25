@@ -33,7 +33,11 @@ export function SubmitLinkForm() {
     try {
       const { error } = await supabase
         .from('links')
-        .insert([values]);
+        .insert({
+          title: values.title,
+          url: values.url,
+          approved: false
+        });
 
       if (error) throw error;
       

@@ -26,6 +26,8 @@ const Index = () => {
         <div className="bg-[#c0c0c0] p-4 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-gray-800">
           <h1 className="text-4xl font-bold text-black text-center mb-4">Clanker feed</h1>
           
+          <p className="text-black text-xl mb-4 text-center">Let's have a laugh at the goddamn clankers before they all annihilate us 🤣 😭</p>
+          
           <div className="text-left p-4 border-2 border-gray-800 bg-white">
             <p className="font-bold text-black text-xl mb-2">
               clanker <span className="font-normal text-gray-600 text-lg">/ˈklæŋkər/</span>

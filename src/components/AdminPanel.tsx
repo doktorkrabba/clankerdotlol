@@ -30,19 +30,23 @@ export function AdminPanel() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('links')
         .update({ approved: true })
-        .eq('id', id);
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) throw error;
+      return data;
     },
     onSuccess: () => {
-      toast.success("Link approved!");
-      queryClient.invalidateQueries({ queryKey: ['links'] });
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+      toast.success("Link approved successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Approval error:', error);
       toast.error("Failed to approve link");
     }
   });
@@ -57,8 +61,8 @@ export function AdminPanel() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Link rejected!");
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });
+      toast.success("Link rejected!");
     },
     onError: () => {
       toast.error("Failed to reject link");

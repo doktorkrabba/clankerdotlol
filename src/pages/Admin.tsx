@@ -1,106 +1,10 @@
 import { AdminPanel } from "@/components/AdminPanel";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { Session } from '@supabase/supabase-js';
-import { useSessionContext } from '@supabase/auth-helpers-react';
 
 const Admin = () => {
-  const { session, isLoading } = useSessionContext();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      checkAdminStatus(session.user.id);
-    } else if (!isLoading && !session) {
-      setIsAdmin(false);
-    }
-  }, [session, isLoading]);
-
-  const checkAdminStatus = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", userId)
-        .single();
-
-      if (error) throw error;
-      setIsAdmin(data.role === "admin");
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-      toast.error("Error checking permissions");
-      setIsAdmin(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#008080] p-4 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg">
-          <p className="text-center">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-[#008080] p-4">
-        <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="light"
-            providers={[]}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-[#008080] p-4">
-        <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center mb-6">Access Denied</h1>
-          <p className="text-center mb-4">
-            You do not have permission to access this page.
-          </p>
-          <button
-            onClick={() => {
-              supabase.auth.signOut();
-              navigate("/");
-            }}
-            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
-          >
-            Sign Out
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#008080] p-4">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-white">Admin Panel</h1>
-          <button
-            onClick={() => {
-              supabase.auth.signOut();
-              navigate("/");
-            }}
-            className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
-          >
-            Sign Out
-          </button>
-        </div>
+        <h1 className="text-4xl font-bold text-white">Admin Panel</h1>
         <AdminPanel />
       </div>
     </div>

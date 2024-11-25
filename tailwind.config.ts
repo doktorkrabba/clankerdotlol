@@ -19,7 +19,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"MS Sans Serif"', '"Microsoft Sans Serif"', 'Tahoma', 'sans-serif'],
+        sans: ['VT323', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

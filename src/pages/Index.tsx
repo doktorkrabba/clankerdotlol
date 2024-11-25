@@ -1,11 +1,25 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { SubmitLinkForm } from "@/components/SubmitLinkForm";
+import { ContentDisplay } from "@/components/ContentDisplay";
 
 const Index = () => {
+  const approvedContent = []; // TODO: Fetch from backend
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-[#008080] p-4">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <h1 className="text-4xl font-bold text-white text-center mb-8">Content Curator</h1>
+        
+        <SubmitLinkForm />
+        
+        <div className="space-y-4">
+          {approvedContent.map((content, index) => (
+            <ContentDisplay
+              key={index}
+              url={content.url}
+              type={content.type}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

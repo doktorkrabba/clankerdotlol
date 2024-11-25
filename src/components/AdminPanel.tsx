@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 interface Link {
   id: string;
@@ -14,7 +14,7 @@ interface Link {
 export function AdminPanel() {
   const queryClient = useQueryClient();
   
-  const { data: links, isLoading, refetch } = useQuery({
+  const { data: links, isLoading } = useQuery({
     queryKey: ['pending-links'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -28,36 +28,42 @@ export function AdminPanel() {
     },
   });
 
-  const handleApprove = async (id: string) => {
-    const { error } = await supabase
-      .from('links')
-      .update({ approved: true })
-      .eq('id', id);
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('links')
+        .update({ approved: true })
+        .eq('id', id);
 
-    if (error) {
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Link approved!");
+      queryClient.invalidateQueries({ queryKey: ['links'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-links'] });
+    },
+    onError: () => {
       toast.error("Failed to approve link");
-      return;
     }
+  });
 
-    toast.success("Link approved!");
-    queryClient.invalidateQueries({ queryKey: ['links'] });
-    queryClient.invalidateQueries({ queryKey: ['pending-links'] });
-  };
+  const rejectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('links')
+        .delete()
+        .eq('id', id);
 
-  const handleReject = async (id: string) => {
-    const { error } = await supabase
-      .from('links')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Link rejected!");
+      queryClient.invalidateQueries({ queryKey: ['pending-links'] });
+    },
+    onError: () => {
       toast.error("Failed to reject link");
-      return;
     }
-
-    toast.success("Link rejected!");
-    queryClient.invalidateQueries({ queryKey: ['pending-links'] });
-  };
+  });
 
   if (isLoading) {
     return (
@@ -87,13 +93,15 @@ export function AdminPanel() {
                 </div>
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => handleApprove(link.id)}
+                    onClick={() => approveMutation.mutate(link.id)}
+                    disabled={approveMutation.isPending}
                     className="bg-[#c0c0c0] border-2 border-gray-800 hover:bg-[#d4d4d4] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
                     Approve
                   </Button>
                   <Button
-                    onClick={() => handleReject(link.id)}
+                    onClick={() => rejectMutation.mutate(link.id)}
+                    disabled={rejectMutation.isPending}
                     variant="destructive"
                     className="border-2 border-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >

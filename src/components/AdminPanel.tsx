@@ -30,22 +30,19 @@ export function AdminPanel() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const linkToUpdate = links?.find(link => link.id === id);
-      if (!linkToUpdate) {
-        throw new Error('Could not find link in current list');
-      }
-
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('links')
         .update({ approved: true })
-        .eq('id', id);
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
         console.error('Supabase error:', error);
         throw error;
       }
 
-      return linkToUpdate;
+      return data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });

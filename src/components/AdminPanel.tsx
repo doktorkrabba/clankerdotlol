@@ -30,20 +30,6 @@ export function AdminPanel() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { data: existingLink } = await supabase
-        .from('links')
-        .select()
-        .eq('id', id)
-        .single();
-
-      if (!existingLink) {
-        throw new Error('Link not found');
-      }
-
-      if (existingLink.approved) {
-        throw new Error('Link is already approved');
-      }
-
       const { data, error } = await supabase
         .from('links')
         .update({ approved: true })
@@ -53,7 +39,11 @@ export function AdminPanel() {
 
       if (error) {
         console.error('Supabase error:', error);
-        throw new Error(error.message);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('Failed to update link');
       }
 
       return data;

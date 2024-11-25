@@ -34,11 +34,13 @@ export function AdminPanel() {
         .from('links')
         .update({ approved: true })
         .eq('id', id)
-        .select()
-        .single();
+        .select();
 
       if (error) throw error;
-      return data;
+      if (!data || data.length === 0) {
+        throw new Error('Link not found');
+      }
+      return data[0];
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });

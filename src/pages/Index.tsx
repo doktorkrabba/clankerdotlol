@@ -2,7 +2,17 @@ import { SubmitLinkForm } from "@/components/SubmitLinkForm";
 import { ContentDisplay } from "@/components/ContentDisplay";
 
 const Index = () => {
-  const approvedContent = []; // TODO: Fetch from backend
+  // This would typically fetch from a backend
+  const approvedContent = [
+    {
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      type: "youtube" as const,
+    },
+    {
+      url: "https://picsum.photos/400/300",
+      type: "image" as const,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[#008080] p-4">

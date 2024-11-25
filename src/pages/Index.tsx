@@ -25,6 +25,10 @@ const Index = () => {
         
         <SubmitLinkForm />
         
+        <p className="text-center text-white italic text-sm mb-4">
+          Your link will be added to the Clanker feed if deemed humorous enough by the Clanker Master 🤖
+        </p>
+        
         <div className="space-y-4">
           {isLoading ? (
             <p className="text-center text-white">Loading...</p>

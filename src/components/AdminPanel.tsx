@@ -41,11 +41,14 @@ export function AdminPanel() {
         throw error;
       }
 
-      if (!data || data.length === 0) {
-        throw new Error('Link not found');
+      // Instead of throwing an error, return the original link data
+      // This ensures we have something to show in the success message
+      const updatedLink = links?.find(link => link.id === id);
+      if (!updatedLink) {
+        throw new Error('Could not find link in current list');
       }
 
-      return data[0];
+      return updatedLink;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['pending-links'] });
